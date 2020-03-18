@@ -110,6 +110,9 @@ def heatmap_init(fun, xmin, xmax, ymin, ymax, points_per_axis=100):
 
 
 def animate(path, all_path, loss):
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+
     plt.figure(figsize=(10, 10))
     fig, ax = plt.subplots()
 
@@ -118,7 +121,7 @@ def animate(path, all_path, loss):
 
     ani = animation.FuncAnimation(fig, lambda i: animation_function(i, all_path, plots_list, ax),
                                   init_func=lambda: heatmap_init(loss, -20, 20, -20, 20),
-                                  frames=500, interval=1, repeat=False, blit=True)
+                                  frames=500, interval=1, repeat=False)
 
 
-    ani.save(filename=path, dpi=200, fps=24)
+    ani.save(filename=path, writer=writer)
