@@ -109,7 +109,7 @@ def heatmap_init(fun, xmin, xmax, ymin, ymax, points_per_axis=100):
     return im,
 
 
-def animate(path, all_path, loss):
+def animate(path, all_path, loss, frames=300):
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
@@ -121,7 +121,9 @@ def animate(path, all_path, loss):
 
     ani = animation.FuncAnimation(fig, lambda i: animation_function(i, all_path, plots_list, ax),
                                   init_func=lambda: heatmap_init(loss, -20, 20, -20, 20),
-                                  frames=500, interval=1, repeat=False)
+                                  frames=frames, interval=1, repeat=False)
 
-
-    ani.save(filename=path, writer=writer)
+    if path:
+        ani.save(filename=path, writer=writer)
+    else:
+        return ani.to_html5_video()
