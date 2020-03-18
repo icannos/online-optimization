@@ -1,0 +1,161 @@
+\documentclass[fleqn,11pt, french, ceqn]{article}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper, scale=0.8]{geometry}
+\usepackage[francais]{babel}
+\usepackage{subfiles}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{pbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
+
+\usepackage{pdfpages}
+
+\usepackage{tikz}
+
+\usepackage{graphicx}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\input{macros}
+\input{macros_graph}
+
+
+\title{Adam: A method for stochastic Optimization}
+\author{Maxime \textsc{Darrin}}
+
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+
+	\newpage
+	
+	\section{Introduction}
+	
+	Adam est une méthode originellement proposée par en 2015 par D.P Kingma et J. Lei Ba à la conférence ICLR. C'est une méthode d'optimisation du premier ordre introduisant une méthode de conservation du moment d'inertie (\emph{momentum} en anglais) couplée à un \emph{learning rate} adaptatif.
+	
+	Il reprend le principe de l'\emph{adaptative learning rate} utilisé par \emph{Adadelta\cite{adadelta}} et \emph{RMSProp\cite{rmsprop}}, c'est à dire qu'il conserve une moyenne temporelle (l'importance du passé diminue exponentiellement avec le temps) du carré des gradients précédemment calculés de sorte à conserve une notion de variance des-dits gradients.
+		
+	A cela, il ajoute une conservation de l'inertie. Il estime la moyenne des gradients (simples cette fois-ci) précédemment calculés, de même que précédemment en accordant plus d'importance aux observations récentes qu'au passé en faisant diminuer exponentiellement avec le temps l'importance du passé. L'idée est de conserver une notion de moyenne de la pente courante et de continuer à aller "un peu" dans les directions prises dans le passé.
+	
+	Ces deux propriétés simulent en fait la trajectoire qu'une boule qui roulerait (avec de la friction) sur la surface d'erreur, aurait.
+	
+	Dans un premier temps 
+	
+	
+	\section{Principes et justification}
+	
+	\subsection{\emph{Adaptavie learning rate}}
+	
+	Tout d'abord, on rappelle la méthode \emph{RMS Prop} proposée par Geoff Hinton\cite{rmsprop}. On maintient une estimation de la moyenne des carrés des coordonnées des gradients, c'est à dire de la variance non centrée. Et on l'utilise pour adapter le \emph{learning rate}. Dans la suite on notera $g_t$ le vecteur des gradient calculé au temps $t$ et l'application des carrés se fait coordonnées à coordonnées.
+	
+	\begin{figure}[H]
+		\centering
+		\begin{align*}
+			E[g^2]_t &= 0.9 E[g^2]_{t-1} + 0.1 g^2_t \\ 
+			\theta_{t+1} &= \theta_{t} - \dfrac{\eta}{\sqrt{E[g^2]_t + \epsilon}} g_{t} 
+		\end{align*}
+		\caption{Mise à jour pour \emph{RMSProp}}
+	\end{figure}
+
+	\emph{Adam} reprend ce principe de manière plus générale: pour $\beta_2 \in [0,1]$ , on calcule $v_t = \beta_2 b_{t-1} +  (1-\beta_2)g_t^2$.
+	
+	Les auteurs notes que cet estimateur est biaisé vers $0$ en particulier lorsque $\beta_2$ est proche de $1$. Ils proposent alors de redresser cet estimateur pour le rendre non biaisé:
+	
+	\begin{align*}
+		\hat{v}_t &= \dfrac{v_t}{1 - \beta^t_2}
+	\end{align*}
+	
+	\subsection{Inertie}
+	
+	En plus de l'adaptation du \emph{learning rate} \emph{Adam} conserve de l'inertie dans sa descente de gradient, pour ce faire maintien une estimation de la moyenne des prédédents gradients, pour $\beta_1$: $m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$
+	
+	Néanmoins, comme pour la variance cet estimateur de la moyenne est biaisé. On le redresse de la même manière:
+	\begin{align*}
+		\hat{m}_t &= \dfrac{m_t}{1 - \beta^t_1}
+	\end{align*}
+	
+	\subsection{Couplage des deux grandeurs}
+	
+	En couplant les estimations de l'inertie et de la variance on obtient une règle de mise à jour qui adapte le \emph{learning rate} et qui simule l'inertie de descente:
+	\begin{center}
+	$
+		\begin{array}{ll}
+		m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t & \hat{m}_t = \dfrac{m_t}{1 - \beta^t_1} \\
+		v_t = \beta_2 b_{t-1} +  (1-\beta_2)g_t^2 & \hat{v}_t = \dfrac{v_t}{1 - \beta^t_2} \\
+		
+		\theta_{t+1} = \theta_{t} - \dfrac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t & \\
+		\end{array}
+	$
+	\end{center}
+
+	On peut alors analyser la règle de mise à jour. On a $\Delta_{t+1} = \theta_{t+1} - \theta_{t} = - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$. Ainsi, la taille d'un pas de la descente de gradient est de l'ordre de $\frac{\hat{m}_t}{\sqrt{\hat{v}_t}}$, c'est à dire la moyenne sur le carré de la variance non centrée qui est ici le ratio signal bruit. Et on voit donc, que lorsque ce ratio est faible, c'est à dire que le bruit est élevé -- et donc l'incertitude sur la direction à suivre, on fait des pas plus petits ce qui correspond intuitivement à ce que l'on voudrait faire. En effet, cette incertitude est en général d'autant plus grande qu'on se rapproche d'un minimum (local ou non). Au contraire, lorsque ce ratio est élevé, on peut se permettre de faire de plus grands pas sans risques.
+	
+	\section{Algorithme ADAM}
+	
+	\begin{algorithm}[H]
+		\begin{algorithmic}
+			\REQUIRE{$\eta$ stepsize}
+			\REQUIRE{$\beta_1, \beta_2, \epsilon \in  [0,1]$}
+			\REQUIRE{$f(\theta)$ loss to minimize}
+			
+			\STATE{Initialize $\theta_0$}
+			\STATE{Initialize $m_0, v_0$ to zeros vectors}
+			\STATE{$t \gets 0$}
+			
+			\WHILE{$\theta_n$ has not converged}
+				\STATE{$g_t \gets \gradient_{\theta_t} f(\theta_t)$}
+				\STATE{$m_t \gets \beta_1 m_{t-1} + (1-\beta_1) g_t$}
+				\STATE{$v_t \gets \beta_2 b_{t-1} +  (1-\beta_2)g_t^2$}
+				\STATE{$\hat{m}_t \gets \dfrac{m_t}{1 - \beta^t_1}$}
+				\STATE{$ \hat{v}_t \gets \dfrac{v_t}{1 - \beta^t_2}$}
+				
+				\STATE{$\theta_{t+1} \gets \theta_{t} - \dfrac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$}
+				\STATE{$t \gets t +1$}
+			\ENDWHILE
+		\end{algorithmic}
+	\caption{ Adam}
+	\end{algorithm}
+	
+	\section{Résultats empiriques}
+	
+	\subsection{Comportement sur des problèmes jouets}
+	
+	On commence par tester l'algorithme présenté pour optimiser des fonctions jouets et on compare les résultats obtenus avec une descente de gradient usuelle.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.5]{../gdsvm/exports/adam-rms-sgd.png}
+		\caption{Comparaison entre adam (vert), sgd (bleu) et RMSProp (rose)}
+	\end{figure}
+	
+	\subsection{Résultats sur MNIST}
+	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.35]{../gdsvm/exports/adam_train.png}
+		\caption{Erreur et précision sur MNIST pour le jeu d'entraînement et le jeu de validation}
+	\end{figure}
+	
+	
+	
+	
+	
+	\subsection{Comparaison avec d'autres algorithmes}
+	
+	
+
+	
+	
+
+\end{document}

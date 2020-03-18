@@ -1,0 +1,11 @@
+\babel@toc {french}{}
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}% 
+\contentsline {section}{\numberline {2}Principes et justification}{2}{section.2}% 
+\contentsline {subsection}{\numberline {2.1}\emph {Adaptavie learning rate}}{2}{subsection.2.1}% 
+\contentsline {subsection}{\numberline {2.2}Inertie}{3}{subsection.2.2}% 
+\contentsline {subsection}{\numberline {2.3}Couplage des deux grandeurs}{3}{subsection.2.3}% 
+\contentsline {section}{\numberline {3}Algorithme ADAM}{4}{section.3}% 
+\contentsline {section}{\numberline {4}Résultats empiriques}{4}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Comportement sur des problèmes jouets}{4}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Résultats sur MNIST}{6}{subsection.4.2}% 
+\contentsline {subsection}{\numberline {4.3}Comparaison avec d'autres algorithmes}{6}{subsection.4.3}% 

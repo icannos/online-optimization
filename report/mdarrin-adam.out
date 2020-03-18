@@ -1,0 +1,10 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Principes\040et\040justification}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Adaptavie\040learning\040rate}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Inertie}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Couplage\040des\040deux\040grandeurs}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Algorithme\040ADAM}{}% 6
+\BOOKMARK [1][-]{section.4}{Résultats empiriques}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Comportement sur des problèmes jouets}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Résultats sur MNIST}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.3}{Comparaison\040avec\040d'autres\040algorithmes}{section.4}% 10
