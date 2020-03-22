@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Computing adam mean and variance}
+\PYG{n}{m} \PYG{o}{=} \PYG{n}{beta1} \PYG{o}{*} \PYG{n}{prev\PYGZus{}m} \PYG{o}{+} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{beta1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{grad}
+\PYG{n}{v} \PYG{o}{=} \PYG{n}{beta2} \PYG{o}{*} \PYG{n}{prev\PYGZus{}v} \PYG{o}{+} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{beta2}\PYG{p}{)}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{power}\PYG{p}{(}\PYG{n}{grad}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} We correct them to avoid biais to 0}
+\PYG{n}{mchap} \PYG{o}{=} \PYG{n}{m} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{power}\PYG{p}{(}\PYG{n}{beta1}\PYG{p}{,} \PYG{n}{t}\PYG{p}{))}
+\PYG{n}{vchap} \PYG{o}{=} \PYG{n}{v} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{power}\PYG{p}{(}\PYG{n}{beta2}\PYG{p}{,} \PYG{n}{t}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} update weights}
+\PYG{n}{w} \PYG{o}{=} \PYG{n}{w} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{n}{eta} \PYG{o}{/} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{vchap}\PYG{p}{)}\PYG{o}{+}\PYG{n}{eps}\PYG{p}{))} \PYG{o}{*} \PYG{n}{mchap}
+\end{Verbatim}

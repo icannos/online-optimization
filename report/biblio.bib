@@ -1,180 +1,39 @@
-@article{A3C,
-Author = {Volodymyr Mnih and Adrià Puigdomènech Badia and Mehdi Mirza and Alex Graves and Timothy P. Lillicrap and Tim Harley and David Silver and Koray Kavukcuoglu},
-Title = {Asynchronous Methods for Deep Reinforcement Learning},
+@misc{adam,
+Author = {Diederik P. Kingma and Jimmy Ba},
+Title = {Adam: A Method for Stochastic Optimization},
+Year = {2014},
+Eprint = {arXiv:1412.6980},
+}
+
+@misc{adagrad,
+Author = {Rachel Ward and Xiaoxia Wu and Leon Bottou},
+Title = {AdaGrad stepsizes: Sharp convergence over nonconvex landscapes, from any initialization},
+Year = {2018},
+Eprint = {arXiv:1806.01811},
+}
+
+@inproceedings{zinka,
+author = {Zinkevich, Martin},
+title = {Online Convex Programming and Generalized Infinitesimal Gradient Ascent},
+year = {2003},
+isbn = {1577351894},
+publisher = {AAAI Press},
+booktitle = {Proceedings of the Twentieth International Conference on International Conference on Machine Learning},
+pages = {928–935},
+numpages = {8},
+location = {Washington, DC, USA},
+series = {ICML’03}
+}
+
+@misc{rmsprop,
+Author = {Sebastian Ruder},
+Title = {An overview of gradient descent optimization algorithms},
 Year = {2016},
-Eprint = {arXiv:1602.01783},
-Howpublished = {ICML 2016},
+Eprint = {arXiv:1609.04747},
 }
-
-@misc{dql,
-	Author = {Volodymyr Mnih and Koray Kavukcuoglu and David Silver and Alex Graves and Ioannis Antonoglou and Daan Wierstra and Martin Riedmiller},
-	Title = {Playing Atari with Deep Reinforcement Learning},
-	Year = {2013},
-	Eprint = {arXiv:1312.5602},
+@misc{adadelta,
+Author = {Matthew D. Zeiler},
+Title = {ADADELTA: An Adaptive Learning Rate Method},
+Year = {2012},
+Eprint = {arXiv:1212.5701},
 }
-
-
-@online{collaborativecells,
-	author={Maxime Darrin},
-	Title={MADDPG implementation in Tensorflow},
-	howpublished={https://github.com/icannos/collaborativecells}
-}
-
-@inproceedings{ddpg,
-  title={Deterministic policy gradient algorithms},
-  author={Silver, D. AND Lever, G. AND Heess, N. AND Degris, T. AND Wierstra, D. AND Riedmiller, M.},
-  year={2014},
-  booktitle = {Proceedings of the 31st International Conference on Machine Learning}
-}
-
-@inproceedings{maddpg,
-	title={Multi-agent actor-critic for mixed cooperative-competitive environments},
-	author={Lowe, R. and Wu, Y. and Tamar, A. and Harb, J. and Abbeel, P. and Mordatch, I.},
-	booktitle={Advances in Neural Information Processing Systems},
-	pages={6379--6390},
-	year={2017}
-}
-
-%%%%
-
-@phdthesis{watkins,
-author = {Watkins, C.J.C.H.},
-title={Learning from delayed rewards},
-school={University of Cambridge},
-year={1988}
-}
-
-@article{jaakola,
-author = {Jaakkola, T. AND Jordan, M.I. AND Singh, S. P. },
-journal={Neural computation},
-title={On the convergence of stochastic iterative dynamic programming algorithms},
-year={1994},
-volume = {6},
-number = {6},
-pages = {1185--1201}
-}
-
-@inproceedings{offPAC,
-author = {Degris, T. AND White, M. AND Sutton, R. S.},
-booktitle={Proceedings of the 29th International Conference on Machine Learning},
-title = {Off-Policy Actor-Critic.},
-year={2012},
-Eprint = {arXiv:1205.4839}
-}
-
-@misc{bach,
-author= {Bach, F.},
-title = {Stochastic gradient methods for machine learning},
-note = {Lecture notes. Ecole Normale Supérieure},
-year={2013},
-howpublished = {\url{https://www.di.ens.fr/~fbach/sag_sgd_fbach_09_2012.pdf}}
-}
-
-@book{sutton,
-author={Sutton, R.S. AND Barto, A. G.},
-publisher={MIT Press},
-edition = {Second edition},
-title = {Reinforcement learning: an introduction},
-year = {2018}
-}
-
-@inproceedings{baird,
-author = {Baird, L.},
-booktitle={Proceedings of the 12th International Conference on Machine Learning},
-title = {Residual algorithms : reinforcement learning with function approximation},
-year = {1995},
-pages = {30--37}
-}
-
-@article{greensmith,
-author = {Greensmith, E. AND Bartlett, P.L. AND Baxter, J.},
-journal={Journal of Machine Learning Research},
-title = {Variance reduction techniques for gradient estimates in
-Reinforcement Learning},
-volume = {5},
-pages = {1471--1530},
-year = {2004}
-}
-
-@inproceedings{schulman,
-author = {Schulman, J. AND Moritz, P. AND Levine, S. AND Jordan, M.I. AND Abbeel, P.},
-booktitle={International Conference on Learning Representations},
-title = {High-dimensional continuous control using generalized advantage estimation},
-year = {2016},
-Eprint = {arXiv:1506.02438}
-}
-
-@article{bu,
-author = {Busoniu, L. AND Babuska, R. AND De Schutter, B.},
-journal={IEEE Transactions on Systems Man and Cybernetics Part C Applications and Reviews},
-publisher = {IEEE},
-title = {A comprehensive survey of multiagent reinforcement learning},
-volume = {38},
-number = {2},
-pages = {156--172},
-year = {2008}
-}
-
-@inproceedings{tan,
-author = {Tan M.},
-booktitle={Proceedings of the tenth International Conference on Machine Learning},
-title = {Multi-agent reinforcement learning : independent vs. cooperative agents},
-year = {1993},
-pages = {330-337}
-}
-
-@article{tampuu,
-author = {Tampuu, A. AND Matiisen, T. AND Kodelja, D. AND Kuzovkin, I. AND Korjus, K. AND Aru, J. AND Vicente, R.},
-journal={PloS one},
-title = {Multiagent cooperation and competition with deep reinforcement learning},
-year = {2017}
-}
-
-@inproceedings{tesauro,
-author = {Tesauro, G.},
-booktitle={Advances in Neural Information Processing Systems},
-volume = {16},
-pages = {871--878},
-title = {Extending q-learning to general adaptive multi-agent systems},
-year = {2004}
-}
-
-@article{foerster,
-author = {Foerster, J.N. AND Nardelli, N. AND Farquhar, G. AND Torr, P.H.S. AND Kohli, P. AND Whiteson, S.},
-journal={CoRR},
-title = {Stabilising experience replay for deep multi-agent reinforcement learning},
-year = {2017}
-}
-
-@misc{maddpgimpl,
-author= {Maxime Darrin,
-title = {Implementation of the Multi agent deep deterministic policy gradient},
-year={2019},
-howpublished = {\url{https://github.com/icannos/collaborativecells}}
-}
-@misc{lol,
-author= {Open AI,
-title = {Project Five},
-year={2019},
-howpublished = {\url{https://openai.com/projects/five/}}
-}
-
-@misc{sc2,
-author= {Google DeepMind,
-title = {Alphastar},
-year={2019},
-howpublished = {\url{https://deepmind.com/blog/article/AlphaStar-Grandmaster-level-in-StarCraft-II-using-multi-agent-reinforcement-learning}}
-}
-
-@misc{flearning,
-author= {Google Brain,
-title = {Federated Learning},
-year={2017},
-howpublished = {\url{https://ai.googleblog.com/2017/04/federated-learning-collaborative.html}}
-}
-
-
-
-
-
-

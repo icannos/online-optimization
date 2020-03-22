@@ -1,12 +1,13 @@
-\documentclass[fleqn,11pt, french, ceqn]{article}
+\documentclass[fleqn,11pt, titlepage, french]{article}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{1em}
 
 \usepackage[T1]{fontenc}
+\usepackage{minted}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[a4paper, scale=0.8]{geometry}
+\usepackage[a4paper]{geometry}
 \usepackage[francais]{babel}
 \usepackage{subfiles}
 \usepackage{tabularx}
@@ -68,10 +69,26 @@
 		\caption{Mise à jour pour \emph{RMSProp}}
 	\end{figure}
 
-	\emph{Adam} reprend ce principe de manière plus générale: pour $\beta_2 \in [0,1]$ , on calcule $v_t = \beta_2 b_{t-1} +  (1-\beta_2)g_t^2$.
+	\emph{Adam} reprend ce principe de manière plus générale: pour $\beta_2 \in [0,1]$ , on utilise: \[v_t = \beta_2 v_{t-1} +  (1-\beta_2)g_t^2\] comme estimateur de la variance non centrée des gradients. Cependant cet estimateur est biaisé et il est nécessaire de de le redresser.
 	
-	Les auteurs notes que cet estimateur est biaisé vers $0$ en particulier lorsque $\beta_2$ est proche de $1$. Ils proposent alors de redresser cet estimateur pour le rendre non biaisé:
+	On suppose tout d'abord que pour tout tout $t$, $g_t \follows p(g_t)$, des distributions de probabilité inconnues. L'objectif est d'exprimer $\Esp[v_t]$ fonction de $\Esp[g_t^2]$ pour en extraire le biais -- et donc savoir comment le corriger.
 	
+	Tout d'abord, on note que $v_{t}=\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i} \cdot g_{i}^{2}$.
+	
+	On peut alors passer à l'espérance et obtenir
+	\begin{align*} 
+		\mathbb{E}\left[v_{t}\right] &=\mathbb{E}\left[\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i} \cdot g_{i}^{2}\right] \\ 
+		&=\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i}  \mathbb{E} [g_{i}^{2}] &\text{Par linéarité de l'espérance} \\ 
+		&=\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i}  (\mathbb{E} [g_{t}^{2}] + \zeta_i)  		&\text{où $\Esp g_{i}^{2} = \Esp[g_{t}^{2}] + \zeta_i$} \\
+		&=\left(1-\beta_{2}\right) \sum_{i=1}^{t} (\beta_{2}^{t-i}  \mathbb{E} [g_{t}^{2}] + \beta_{2}^{t-i} \zeta_i) \\
+		&=\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i}  \mathbb{E} [g_{t}^{2}] + \left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i} \zeta_i \\
+		&=\mathbb{E}\left[g_{t}^{2}\right] \cdot\left(1-\beta_{2}\right) \sum_{i=1}^{t} \beta_{2}^{t-i}+\zeta \\ 
+		&=\mathbb{E}\left[g_{t}^{2}\right] \cdot\left(1-\beta_{2}^{t}\right)+\zeta
+	\end{align*}
+	
+	Le terme $\zeta = \sum_{i=1}^{t} \beta_{2}^{t-i}+\zeta$ est rendu petit en compensant les écarts grandissants entre le dernier gradient et les gradients plus lointains par le poids exponentiellement décroissant qui leurs sont attribués.
+	
+	Ainsi on note qu'il suffit de diviser notre estimateur par $1-\beta_{2}^{t}$ pour le redresser. On obtient alors l'estimateur proposé pour \emph{Adam} qui est non biaisé.
 	\begin{align*}
 		\hat{v}_t &= \dfrac{v_t}{1 - \beta^t_2}
 	\end{align*}
@@ -80,7 +97,19 @@
 	
 	En plus de l'adaptation du \emph{learning rate} \emph{Adam} conserve de l'inertie dans sa descente de gradient, pour ce faire maintien une estimation de la moyenne des prédédents gradients, pour $\beta_1$: $m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$
 	
-	Néanmoins, comme pour la variance cet estimateur de la moyenne est biaisé. On le redresse de la même manière:
+	De la même manière que pour la variance, cet estimateur est biaisé et on veut le redresser.
+	
+	\begin{align*} 
+	\mathbb{E}\left[m_{t}\right] &=\mathbb{E}\left[\left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i} \cdot g_{i}\right] \\ 
+	&=\left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i}  \mathbb{E} [g_{i}] &\text{Par linéarité de l'espérance} \\ 
+	&=\left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i}  (\mathbb{E} [g_{t}] + \zeta_i)  		&\text{où $\Esp g_{i} = \Esp[g_{t}] + \zeta_i$} \\
+	&=\left(1-\beta_{1}\right) \sum_{i=1}^{t} (\beta_{1}^{t-i}  \mathbb{E} [g_{t}] + \beta_{1}^{t-i} \zeta_i) \\
+	&=\left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i}  \mathbb{E} [g_{t}] + \left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i} \zeta_i \\
+	&=\mathbb{E}\left[g_{t}\right] \cdot\left(1-\beta_{1}\right) \sum_{i=1}^{t} \beta_{1}^{t-i}+\zeta \\ 
+	&=\mathbb{E}\left[g_{t}\right] \cdot\left(1-\beta_{1}^{t}\right)+\zeta
+	\end{align*}
+	
+	De la même façon que pour la variance $\zeta$ est négligeable quitte à choisir une bonne valeur de $\beta_{2}$
 	\begin{align*}
 		\hat{m}_t &= \dfrac{m_t}{1 - \beta^t_1}
 	\end{align*}
@@ -101,8 +130,11 @@
 
 	On peut alors analyser la règle de mise à jour. On a $\Delta_{t+1} = \theta_{t+1} - \theta_{t} = - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$. Ainsi, la taille d'un pas de la descente de gradient est de l'ordre de $\frac{\hat{m}_t}{\sqrt{\hat{v}_t}}$, c'est à dire la moyenne sur le carré de la variance non centrée qui est ici le ratio signal bruit. Et on voit donc, que lorsque ce ratio est faible, c'est à dire que le bruit est élevé -- et donc l'incertitude sur la direction à suivre, on fait des pas plus petits ce qui correspond intuitivement à ce que l'on voudrait faire. En effet, cette incertitude est en général d'autant plus grande qu'on se rapproche d'un minimum (local ou non). Au contraire, lorsque ce ratio est élevé, on peut se permettre de faire de plus grands pas sans risques.
 	
-	\section{Algorithme ADAM}
 	
+	
+	
+	\section{Algorithme ADAM}
+	\subsection{Pseudo code}
 	\begin{algorithm}[H]
 		\begin{algorithmic}
 			\REQUIRE{$\eta$ stepsize}
@@ -124,22 +156,113 @@
 				\STATE{$t \gets t +1$}
 			\ENDWHILE
 		\end{algorithmic}
-	\caption{ Adam}
+	\caption{Adam}
 	\end{algorithm}
+
+	\subsection{Implémentation python}
 	
+	\begin{figure}[H]
+		\centering
+\begin{minted}{python}
+# Computing adam mean and variance
+m = beta1 * prev_m + (1-beta1)*grad
+v = beta2 * prev_v + (1-beta2)*np.power(grad, 2)
+
+# We correct them to avoid biais to 0
+mchap = m / (1-np.power(beta1, t))
+vchap = v / (1-np.power(beta2, t))
+
+# update weights
+w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
+		\end{minted}
+		\caption{Pas de descente de Adam en python}
+	\end{figure}
+
+	\subsection{Garanties théoriques}
+	
+	Les auteurs de \emph{Adam} proposent un résultat de convergence avec une borne sur le regret atteint par l'algorithme. Nous ne donnerons pas ici la preuve en détails car elle est particulièrement longue mais elle est disponible en annexe du papier original\cite{adam}.
+	
+	On se place dans le cadre décrit par \cite{zinka}. Considérons que nous disposons de $f_1 \cdots f_T$ fonctions de coûts, convexes. A chaque pas de temps on va essayer d'obtenir $\theta_t$ de sorte à minimiser tous les $f_t(\theta_t)$ et on va comparer notre résultat à la solution optimale. On définit ainsi le regret accumulé sur la séquence:
+	\[R(T)=\sum_{t=1}^{T}\left[f_{t}\left(\theta_{t}\right)-f_{t}\left(\theta^{*}\right)\right]\]
+	
+	Avec $\theta^* = \arg\min_{\theta} \sum_{t=1}^T f_t(\theta)$, c'est à dire les paramètres minimisant globalement les $f_t$.
+	
+	Ce processus correspond à la procédure d'entraînement par \emph{batch} dans laquelle on entraîne le modèle séquentiellement par minimisation de fonctions de coûts définies par le \emph{batch} courant.
+	
+	Dans le cadre précédent, on suppose que toutes les $f_t$ sont lipschitzienne pour la norme euclidienne et la norme infinie, de constantes respectivement $D$ et $D_\infty$. On suppose de plus que la distance entre deux $\theta$ consécutifs issus de \emph{adam} est bornée pour les deux normes précédentes par $D$ et $D_\infty$ respectivement. Plus clairement, on demande que les pas générés par \emph{adam} soient de longueurs plus petites que les constante de Lipschitz des fonctions de coûts. Par ailleurs, on suppose que $\beta_{1}, \beta_{2}$ ont été choisi de sorte que $\frac{\beta_{1}^{2}}{\sqrt{\beta_{2}}}<1$
+	On pose alors $\alpha_{t}=\frac{\alpha}{\sqrt{t}}$ et $ \beta_{1, t}=\beta_{1} \lambda^{t-1}, \lambda \in(0,1)$. 
+	
+	On note aussi, $g_{1:T, i} = (g_{1,i} \cdots g_{T,i})$, $\gamma = \frac{\beta_1^2}{\sqrt{\beta_2}}$.
+	
+	On peut alors borner le regret atteint par \emph{Adam}:
+	\[R(T) \leq \frac{D^{2}}{2 \alpha\left(1-\beta_{1}\right)} \sum_{i=1}^{d} \sqrt{T \widehat{v}_{T, i}}+\frac{\alpha\left(1+\beta_{1}\right) G_{\infty}}{\left(1-\beta_{1}\right) \sqrt{1-\beta_{2}}(1-\gamma)^{2}} \sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}+\sum_{i=1}^{d} \frac{D_{\infty}^{2} G_{\infty} \sqrt{1-\beta_{2}}}{2 \alpha\left(1-\beta_{1}\right)(1-\lambda)^{2}}\]
+	
+	Les auteurs notes en particulier que dans le cas où les gradients sont très creux -- par exemple lorsque les données en entrées le sont -- le terme $\sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}$ peut être particulièrement petit et mener à des résultats de convergences plus forts dans certains cas.
+	
+	Néanmoins, dans le cas général on peut obtenir un regret moyen asymptotique de l'ordre $\Orond(\frac{1}{\sqrt{T}})$. Il suffit d'utiliser dans l'expression précédente le fait que $\sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2} \leq d G_\infty \sqrt{T}$, car les gradients sont bornés par hypothèses.
+	
+	En effet on a:
+	\begin{align*}
+		R(T) & \leq \frac{D^{2}}{2 \alpha\left(1-\beta_{1}\right)} \sum_{i=1}^{d} \sqrt{T \widehat{v}_{T, i}}+\frac{\alpha\left(1+\beta_{1}\right) G_{\infty}}{\left(1-\beta_{1}\right) \sqrt{1-\beta_{2}}(1-\gamma)^{2}} \sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}+\sum_{i=1}^{d} \frac{D_{\infty}^{2} G_{\infty} \sqrt{1-\beta_{2}}}{2 \alpha\left(1-\beta_{1}\right)(1-\lambda)^{2}} \\
+		&\leq \frac{D^{2}}{2 \alpha\left(1-\beta_{1}\right)} \sum_{i=1}^{d} \sqrt{T \widehat{v}_{T, i}}+\frac{\alpha\left(1+\beta_{1}\right) G_{\infty}}{\left(1-\beta_{1}\right) \sqrt{1-\beta_{2}}(1-\gamma)^{2}} d G_\infty \sqrt{T} +\sum_{i=1}^{d} \frac{D_{\infty}^{2} G_{\infty} \sqrt{1-\beta_{2}}}{2 \alpha\left(1-\beta_{1}\right)(1-\lambda)^{2}} \\
+		&\underset{T \longrightarrow \infty}{\follows} \frac{D^{2}}{2 \alpha\left(1-\beta_{1}\right)} \sum_{i=1}^{d} \sqrt{T \widehat{v}_{T, i}}+\frac{\alpha\left(1+\beta_{1}\right) G_{\infty}}{\left(1-\beta_{1}\right) \sqrt{1-\beta_{2}}(1-\gamma)^{2}} d G_\infty \sqrt{T} \\
+		&\underset{T \longrightarrow \infty}{=} \Orond(\sqrt{T})
+	\end{align*}
+	D'où $\frac{R(T)}{T} \underset{T \longrightarrow \infty}{=} \Orond(\frac{1}{\sqrt{T}})$
+
 	\section{Résultats empiriques}
 	
 	\subsection{Comportement sur des problèmes jouets}
 	
-	On commence par tester l'algorithme présenté pour optimiser des fonctions jouets et on compare les résultats obtenus avec une descente de gradient usuelle.
+	On commence par tester l'algorithme présenté pour optimiser des fonctions jouets et on compare les résultats obtenus avec une descente de gradient usuelle. Le problème présenté ici consiste à minimiser la fonction $f_{y_1, y_2} = \norm{x-y_1} * (\norm{x-y_2} +2) $, avec $y_1 = (-10, 0)$ et $y_2 = (10, 0)$. Cette fonction assure la présence de deux minimums locaux en $y_1$ et en $y_2$ avec le minimum global en $y_1$ meilleur que celui en $y_2$. On va utiliser cette dissymétrie pour comparer les différents algorithmes et leur capacité à trouver le minimum global.
+	
+	Dans les exemples ci-dessous, on observe qu'\emph{Adam} est plus effficace que les autres algorithmes pour trouver le minimum global comme on peut le voir il rejoint toujours le meilleur minimum dans ces exemples. Même placé proche de $y_2$, il arrive à s'extirper de la pente la plus "proche" pour atteindre $y_1$ dans plus de cas que les autres algorithmes.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.5]{../gdsvm/exports/adam-rms-sgd.png}
-		\caption{Comparaison entre adam (vert), sgd (bleu) et RMSProp (rose)}
+		\includegraphics[scale=0.3]{../gdsvm/exports/adam-rms-sgd.png}
+		\caption{Comparaison entre adam et différents algorithmes usuels}
 	\end{figure}
+
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{../gdsvm/exports/init-0.png}
+		\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{../gdsvm/exports/init-1.png}
+	\end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+	\centering
+	\includegraphics[scale=0.5]{../gdsvm/exports/init-2.png}
+\end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+	\centering
+	\includegraphics[scale=0.5]{../gdsvm/exports/init-3.png}
+\end{subfigure}
+\caption{Différentes trajectoires avec différentes initialisations}
+	\end{figure}
+
 	
 	\subsection{Résultats sur MNIST}
+	
+	\subsubsection{Protocole expérimental}
+	
+	On utilise le jeu de données d'entraînement complet pour entraîner par batch la SVM du cours à partir de fonction donnant le gradient de la fonction de coût que l'on souhaite minimiser données en cours.
+	
+	On effectue un nombre d'epoch fixé et pour chaque epoch on fait une passe sur l'ensemble du jeu de données scindé en batch. Pour chaque batch (et donc pas de descente) on sauvegarde l'erreur courante et la précision courante sur le batch en cours et sur l'ensemble du jeu de test pour constituer les graphiques qui suivent.
+	
+	\subsubsection{Aperçu global et premières comparaisons}
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=1\linewidth]{../gdsvm/exports/mnist-comparison}
+		\caption{Comparaison globale d'Adam sur MNIST}
+		\label{fig:mnist-comparison}
+	\end{figure}
+	
 	
 		\begin{figure}[H]
 		\centering
@@ -148,10 +271,119 @@
 	\end{figure}
 	
 	
+	\subsubsection{Efficacité de Adam selon la taille des batch}
 	
+	L'une des motivations avancées pour le développement d'\emph{Adam} par ses auteurs était la résistance à ce genre de bruit induit par les différentes fonctions définies par chaque batch. On peut donc comparer la résilience d'\emph{Adam} face à différentes tailles de batch.
 	
+	Tout d'abord on peut observer l'influence de la taille des batch sur Adam seul\footnote{Tous les graphes sont disponibles en grande taille dans le dossier gdsvm/exports/.}.
 	
-	\subsection{Comparaison avec d'autres algorithmes}
+	On présente d'abord ici globalement les effets de la taille des batchs sur tous les algorithmes, puis plus précisément l'effet de cette taille sur les très petits batchs.
+	
+			\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch8-adam_step.png}
+			\caption{batch\_size = 8}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch64-adam_step.png}
+			\caption{batch\_size = 64}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch128-adam_step.png}
+			\caption{batch\_size = 128}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch512-adam_step.png}
+			\caption{batch\_size = 512}
+		\end{subfigure}
+		
+		\caption{Influence de la taille des batch sur Adam}
+	\end{figure}
+
+
+			\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{../gdsvm/exports/mnist-batch1-adam_step.png}
+		\caption{batch\_size = 1}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{../gdsvm/exports/mnist-batch2-adam_step.png}
+		\caption{batch\_size = 2}
+	\end{subfigure}
+	\begin{subfigure}{1\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{../gdsvm/exports/mnist-batch5-adam_step.png}
+		\caption{batch\_size = 5}
+	\end{subfigure}
+	
+	\caption{Influence de la taille des batch sur Adam}
+\end{figure}
+
+	Et comparer les résultats avec les autres algorithmes usuels.
+	
+		
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch8-comparison.png}
+			\caption{batch\_size = 8}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch64-comparison.png}
+			\caption{batch\_size = 64}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch128-comparison.png}
+			\caption{batch\_size = 128}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch512-comparison.png}
+			\caption{batch\_size = 512}
+		\end{subfigure}
+		
+		\caption{Influence de la taille des batch, comparaison avec les autres algorithmes}
+	\end{figure}
+
+	\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch1-comparison.png}
+		\caption{batch\_size = 1}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		\centering
+		\includegraphics[scale=0.25]{../gdsvm/exports/mnist-batch2-comparison.png}
+		\caption{batch\_size = 2}
+	\end{subfigure}
+	\begin{subfigure}{1\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{../gdsvm/exports/mnist-batch5-comparison.png}
+		\caption{batch\_size = 5}
+	\end{subfigure}
+	
+	\caption{Influence de la taille des batch, comparaison avec les autres algorithmes}
+\end{figure}
+
+	On peut noter la vitesse de convergence bien plus grande de \emph{Adam} sur les grands batch que pour les autres algorithmes.
+	
+\bibliographystyle{plain}	
+\bibliography{biblio}
+
+	
+
 	
 	
 

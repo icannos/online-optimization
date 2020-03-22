@@ -58,14 +58,21 @@ def training_loop(epochs, w, step_function, loss_fn, grad_fn, eps=1E-5, **hyperp
         t+=1
 
     # We plot the error surface and the paths
-    plot_gd2(path=(init, steps), label=step_function.__name__)
+
 
     return (init, steps,step_function.__name__)
 
 
+def draw_paths(paths):
+
+    plot_heatmap(loss_2d, -20, 20, -20, 20)
+
+    for init, steps, name in paths:
+        plot_gd2(path=(init, steps), label=name)
+
+
 if __name__=="__main__":
     # We display the background
-    plot_heatmap(loss_2d, -20, 20, -20, 20)
 
     init = np.array([-8.,15.])
 
@@ -78,7 +85,9 @@ if __name__=="__main__":
     all_path.append(training_loop(300, copy(init), step_function=simple_momentum_step, loss_fn=loss_2d, grad_fn=grad_2d))
     all_path.append(training_loop(300, copy(init), step_function=adagrad_step, loss_fn=loss_2d, grad_fn=grad_2d))
 
+    draw_paths(all_path)
     plt.savefig("exports/adam-rms-sgd.png")
 
     # We build the video
-    animate("exports/animation-2.mp4", all_path, loss_2d)
+    # print(animate(None, all_path, loss_2d))
+    # animate("exports/animation-2.mp4", all_path, loss_2d)

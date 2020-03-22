@@ -1,0 +1,23 @@
+\begin{thebibliography}{1}
+
+\bibitem{adam}
+Diederik~P. Kingma and Jimmy Ba.
+\newblock Adam: A method for stochastic optimization, 2014.
+
+\bibitem{rmsprop}
+Sebastian Ruder.
+\newblock An overview of gradient descent optimization algorithms, 2016.
+
+\bibitem{adadelta}
+Matthew~D. Zeiler.
+\newblock Adadelta: An adaptive learning rate method, 2012.
+
+\bibitem{zinka}
+Martin Zinkevich.
+\newblock Online convex programming and generalized infinitesimal gradient
+  ascent.
+\newblock In {\em Proceedings of the Twentieth International Conference on
+  International Conference on Machine Learning}, ICML’03, page 928–935.
+  AAAI Press, 2003.
+
+\end{thebibliography}

@@ -111,7 +111,7 @@ def heatmap_init(fun, xmin, xmax, ymin, ymax, points_per_axis=100):
 
 def animate(path, all_path, loss, frames=300):
     Writer = animation.FFMpegWriter
-    writer = Writer(fps=15, bitrate=1800)
+    writer = Writer(fps=24, bitrate=1800)
 
     plt.figure(figsize=(10, 10))
     fig, ax = plt.subplots()
@@ -124,6 +124,6 @@ def animate(path, all_path, loss, frames=300):
                                   frames=frames, interval=1, repeat=False)
 
     if path:
-        ani.save(filename=path, writer=writer, dpi=200)
+        ani.save(filename=path, writer=writer, dpi=100)
     else:
         return ani.to_html5_video()

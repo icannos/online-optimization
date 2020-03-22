@@ -2,10 +2,15 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}% 
 \contentsline {section}{\numberline {2}Principes et justification}{2}{section.2}% 
 \contentsline {subsection}{\numberline {2.1}\emph {Adaptavie learning rate}}{2}{subsection.2.1}% 
-\contentsline {subsection}{\numberline {2.2}Inertie}{3}{subsection.2.2}% 
-\contentsline {subsection}{\numberline {2.3}Couplage des deux grandeurs}{3}{subsection.2.3}% 
-\contentsline {section}{\numberline {3}Algorithme ADAM}{4}{section.3}% 
-\contentsline {section}{\numberline {4}Résultats empiriques}{4}{section.4}% 
-\contentsline {subsection}{\numberline {4.1}Comportement sur des problèmes jouets}{4}{subsection.4.1}% 
-\contentsline {subsection}{\numberline {4.2}Résultats sur MNIST}{6}{subsection.4.2}% 
-\contentsline {subsection}{\numberline {4.3}Comparaison avec d'autres algorithmes}{6}{subsection.4.3}% 
+\contentsline {subsection}{\numberline {2.2}Inertie}{4}{subsection.2.2}% 
+\contentsline {subsection}{\numberline {2.3}Couplage des deux grandeurs}{4}{subsection.2.3}% 
+\contentsline {section}{\numberline {3}Algorithme ADAM}{5}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Pseudo code}{5}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Implémentation python}{6}{subsection.3.2}% 
+\contentsline {subsection}{\numberline {3.3}Garanties théoriques}{6}{subsection.3.3}% 
+\contentsline {section}{\numberline {4}Résultats empiriques}{7}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Comportement sur des problèmes jouets}{7}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Résultats sur MNIST}{9}{subsection.4.2}% 
+\contentsline {subsubsection}{\numberline {4.2.1}Protocole expérimental}{9}{subsubsection.4.2.1}% 
+\contentsline {subsubsection}{\numberline {4.2.2}Aperçu global et premières comparaisons}{10}{subsubsection.4.2.2}% 
+\contentsline {subsubsection}{\numberline {4.2.3}Efficacité de Adam selon la taille des batch}{11}{subsubsection.4.2.3}% 
