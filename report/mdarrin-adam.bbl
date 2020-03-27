@@ -1,8 +1,17 @@
 \begin{thebibliography}{1}
 
+\bibitem{adamtrend}
+Vitaly Bushaev.
+\newblock Adam — latest trends in deep learning optimization, 2018.
+
 \bibitem{adam}
 Diederik~P. Kingma and Jimmy Ba.
 \newblock Adam: A method for stochastic optimization, 2014.
+
+\bibitem{limits}
+Liangchen Lua and al.
+\newblock Adaptive gradient methods with dynamic bound of learning rate.
+\newblock 2019.
 
 \bibitem{rmsprop}
 Sebastian Ruder.

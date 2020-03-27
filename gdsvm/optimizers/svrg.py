@@ -6,8 +6,8 @@ from copy import copy
 def svrg_update(w, diffgrad, eta, mu):
     return w - eta * (diffgrad + mu)
 
-
-def training_loop(epochs, grad_fn, loss_fn, w, x, y, batch_size, x_test=None, y_test=None, max_steps=None, m=50, eta=0.01, **params):
+def training_loop(epochs, grad_fn, loss_fn, w, x, y, batch_size, x_test=None,
+y_test=None, max_steps=None, m=50, eta=0.01, **params):
     """
 
     :param epochs: number of epoch to do
@@ -61,8 +61,11 @@ def training_loop(epochs, grad_fn, loss_fn, w, x, y, batch_size, x_test=None, y_
         for i in range(n_batch):
             batch_x = batchs[i][0]
             batch_y = batchs[i][1]
+
+            # Chaque grad \Psi_i
             mu += grad_fn(w, batch_x, batch_y, **params)
 
+        # La moyenne
         mu /= n_batch
 
         # Fin de compute mu

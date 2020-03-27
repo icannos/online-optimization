@@ -18,6 +18,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{subcaption}
 
+\usepackage[nottoc,numbib]{tocbibind}
+
 \usepackage{pdfpages}
 
 \usepackage{tikz}
@@ -45,16 +47,16 @@
 	
 	Adam est une méthode originellement proposée par en 2015 par D.P Kingma et J. Lei Ba à la conférence ICLR. C'est une méthode d'optimisation du premier ordre introduisant une méthode de conservation du moment d'inertie (\emph{momentum} en anglais) couplée à un \emph{learning rate} adaptatif.
 	
-	Il reprend le principe de l'\emph{adaptative learning rate} utilisé par \emph{Adadelta\cite{adadelta}} et \emph{RMSProp\cite{rmsprop}}, c'est à dire qu'il conserve une moyenne temporelle (l'importance du passé diminue exponentiellement avec le temps) du carré des gradients précédemment calculés de sorte à conserve une notion de variance des-dits gradients.
+	Il reprend le principe de l'\emph{adaptative learning rate} utilisé par \emph{Adadelta\cite{adadelta}} et \emph{RMSProp\cite{rmsprop}}, c'est à dire qu'il conserve une moyenne temporelle (l'importance du passé diminue exponentiellement avec le temps) du carré des gradients précédemment calculés de sorte à conserver une notion de variance des-dits gradients.
 		
-	A cela, il ajoute une conservation de l'inertie. Il estime la moyenne des gradients (simples cette fois-ci) précédemment calculés, de même que précédemment en accordant plus d'importance aux observations récentes qu'au passé en faisant diminuer exponentiellement avec le temps l'importance du passé. L'idée est de conserver une notion de moyenne de la pente courante et de continuer à aller "un peu" dans les directions prises dans le passé.
+	A cela, il ajoute une conservation de l'inertie. Il estime la moyenne des gradients (simples cette fois-ci) précédemment calculés, de même que précédemment en accordant plus d'importance aux observations récentes qu'aux passées en faisant diminuer exponentiellement avec le temps l'importance du passé. L'idée est de conserver une notion de moyenne de la pente courante et de continuer à aller "un peu" dans les directions prises dans le passé.
 	
 	Ces deux propriétés simulent en fait la trajectoire qu'une boule qui roulerait (avec de la friction) sur la surface d'erreur, aurait.
 	
-	Dans un premier temps 
+	Dans un premier temps nous commencerons par donner les grandes lignes et justifications de la règle de mise à jour proposée par \emph{Adam}, ensuite nous présenterons l'algorithme et son implémentation en python. Dans un second temps nous détaillerons les garanties théoriques offertes par cet algorithme en terme de regret avant de mettre \emph{Adam} à l'épreuve sur différents problèmes en le comparant aux algorithmes similaires habituellement utilisés.
 	
 	
-	\section{Principes et justification}
+	\section{Principes et justifications}
 	
 	\subsection{\emph{Adaptavie learning rate}}
 	
@@ -86,7 +88,7 @@
 		&=\mathbb{E}\left[g_{t}^{2}\right] \cdot\left(1-\beta_{2}^{t}\right)+\zeta
 	\end{align*}
 	
-	Le terme $\zeta = \sum_{i=1}^{t} \beta_{2}^{t-i}+\zeta$ est rendu petit en compensant les écarts grandissants entre le dernier gradient et les gradients plus lointains par le poids exponentiellement décroissant qui leurs sont attribués.
+	Le terme $\zeta = (1-\beta_2)\sum_{i=1}^{t} \beta_{2}^{t-i}\zeta_i$ est rendu petit en compensant les écarts grandissants entre le dernier gradient et les gradients plus lointains par le poids exponentiellement décroissant qui leurs sont attribués.
 	
 	Ainsi on note qu'il suffit de diviser notre estimateur par $1-\beta_{2}^{t}$ pour le redresser. On obtient alors l'estimateur proposé pour \emph{Adam} qui est non biaisé.
 	\begin{align*}
@@ -109,7 +111,9 @@
 	&=\mathbb{E}\left[g_{t}\right] \cdot\left(1-\beta_{1}^{t}\right)+\zeta
 	\end{align*}
 	
-	De la même façon que pour la variance $\zeta$ est négligeable quitte à choisir une bonne valeur de $\beta_{2}$
+	De la même façon que pour la variance $\zeta$ est négligeable quitte à choisir une bonne valeur de $\beta_{2}$.
+	
+	On peut ainsi corriger ce second estimateur de la même manière:
 	\begin{align*}
 		\hat{m}_t &= \dfrac{m_t}{1 - \beta^t_1}
 	\end{align*}
@@ -180,16 +184,16 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 
 	\subsection{Garanties théoriques}
 	
-	Les auteurs de \emph{Adam} proposent un résultat de convergence avec une borne sur le regret atteint par l'algorithme. Nous ne donnerons pas ici la preuve en détails car elle est particulièrement longue mais elle est disponible en annexe du papier original\cite{adam}.
+	Les auteurs de \emph{Adam} proposent un résultat de convergence avec une borne sur le regret atteint par l'algorithme. Nous ne donnerons pas ici la preuve en détails car elle est particulièrement longue mais elle est disponible en annexe du papier original\cite{adam}, nous nous contenterons de l'énoncer et d'en dériver le comportement asymptotique du regret moyen.
 	
-	On se place dans le cadre décrit par \cite{zinka}. Considérons que nous disposons de $f_1 \cdots f_T$ fonctions de coûts, convexes. A chaque pas de temps on va essayer d'obtenir $\theta_t$ de sorte à minimiser tous les $f_t(\theta_t)$ et on va comparer notre résultat à la solution optimale. On définit ainsi le regret accumulé sur la séquence:
+	On se place dans le cadre décrit par \cite{zinka}. Considérons que nous disposons de $f_1 \cdots f_T$ fonctions de coûts, convexes. A chaque pas de temps on optimise $\theta_t$ de sorte à minimiser $f_t(\theta_t)$ mais aussi tous les autres $f_t$, l'objectif étant qu'à la suite de ces optimisations séquentielles on dispose d'un $\theta$ qui minimise efficacement toutes ces fonctions.  On va comparer notre résultat à la solution optimale. On définit ainsi le regret accumulé sur la séquence:
 	\[R(T)=\sum_{t=1}^{T}\left[f_{t}\left(\theta_{t}\right)-f_{t}\left(\theta^{*}\right)\right]\]
 	
 	Avec $\theta^* = \arg\min_{\theta} \sum_{t=1}^T f_t(\theta)$, c'est à dire les paramètres minimisant globalement les $f_t$.
 	
 	Ce processus correspond à la procédure d'entraînement par \emph{batch} dans laquelle on entraîne le modèle séquentiellement par minimisation de fonctions de coûts définies par le \emph{batch} courant.
 	
-	Dans le cadre précédent, on suppose que toutes les $f_t$ sont lipschitzienne pour la norme euclidienne et la norme infinie, de constantes respectivement $D$ et $D_\infty$. On suppose de plus que la distance entre deux $\theta$ consécutifs issus de \emph{adam} est bornée pour les deux normes précédentes par $D$ et $D_\infty$ respectivement. Plus clairement, on demande que les pas générés par \emph{adam} soient de longueurs plus petites que les constante de Lipschitz des fonctions de coûts. Par ailleurs, on suppose que $\beta_{1}, \beta_{2}$ ont été choisi de sorte que $\frac{\beta_{1}^{2}}{\sqrt{\beta_{2}}}<1$
+	Dans le cadre précédent, on suppose que toutes les $f_t$ sont lipschitziennes pour la norme euclidienne et la norme infinie, de constantes respectivement $D$ et $D_\infty$. On suppose de plus que la distance entre deux $\theta$ consécutifs issus de \emph{adam} est bornée pour les deux normes précédentes par $D$ et $D_\infty$ respectivement. Plus clairement, on demande que les pas générés par \emph{adam} soient de longueurs plus petites que les constante de Lipschitz des fonctions de coûts. Par ailleurs, on suppose que $\beta_{1}, \beta_{2}$ ont été choisi de sorte que $\frac{\beta_{1}^{2}}{\sqrt{\beta_{2}}}<1$
 	On pose alors $\alpha_{t}=\frac{\alpha}{\sqrt{t}}$ et $ \beta_{1, t}=\beta_{1} \lambda^{t-1}, \lambda \in(0,1)$. 
 	
 	On note aussi, $g_{1:T, i} = (g_{1,i} \cdots g_{T,i})$, $\gamma = \frac{\beta_1^2}{\sqrt{\beta_2}}$.
@@ -197,7 +201,7 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 	On peut alors borner le regret atteint par \emph{Adam}:
 	\[R(T) \leq \frac{D^{2}}{2 \alpha\left(1-\beta_{1}\right)} \sum_{i=1}^{d} \sqrt{T \widehat{v}_{T, i}}+\frac{\alpha\left(1+\beta_{1}\right) G_{\infty}}{\left(1-\beta_{1}\right) \sqrt{1-\beta_{2}}(1-\gamma)^{2}} \sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}+\sum_{i=1}^{d} \frac{D_{\infty}^{2} G_{\infty} \sqrt{1-\beta_{2}}}{2 \alpha\left(1-\beta_{1}\right)(1-\lambda)^{2}}\]
 	
-	Les auteurs notes en particulier que dans le cas où les gradients sont très creux -- par exemple lorsque les données en entrées le sont -- le terme $\sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}$ peut être particulièrement petit et mener à des résultats de convergences plus forts dans certains cas.
+	Les auteurs notent en particulier que dans le cas où les gradients sont très creux -- par exemple lorsque les données en entrées le sont -- le terme $\sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2}$ peut être particulièrement petit et mener à des résultats de convergences plus forts dans certains cas.
 	
 	Néanmoins, dans le cas général on peut obtenir un regret moyen asymptotique de l'ordre $\Orond(\frac{1}{\sqrt{T}})$. Il suffit d'utiliser dans l'expression précédente le fait que $\sum_{i=1}^{d}\left\|g_{1: T, i}\right\|_{2} \leq d G_\infty \sqrt{T}$, car les gradients sont bornés par hypothèses.
 	
@@ -210,13 +214,15 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 	\end{align*}
 	D'où $\frac{R(T)}{T} \underset{T \longrightarrow \infty}{=} \Orond(\frac{1}{\sqrt{T}})$
 
+	Ainsi \emph{Adam} atteint le même ordre de grandeur de regret moyen aussi bon que les meilleurs proposés dans la littérature au moment de sa publication\cite{adam} tout en montrant des qualités empiriques supérieures.
+	 
 	\section{Résultats empiriques}
 	
 	\subsection{Comportement sur des problèmes jouets}
 	
 	On commence par tester l'algorithme présenté pour optimiser des fonctions jouets et on compare les résultats obtenus avec une descente de gradient usuelle. Le problème présenté ici consiste à minimiser la fonction $f_{y_1, y_2} = \norm{x-y_1} * (\norm{x-y_2} +2) $, avec $y_1 = (-10, 0)$ et $y_2 = (10, 0)$. Cette fonction assure la présence de deux minimums locaux en $y_1$ et en $y_2$ avec le minimum global en $y_1$ meilleur que celui en $y_2$. On va utiliser cette dissymétrie pour comparer les différents algorithmes et leur capacité à trouver le minimum global.
 	
-	Dans les exemples ci-dessous, on observe qu'\emph{Adam} est plus effficace que les autres algorithmes pour trouver le minimum global comme on peut le voir il rejoint toujours le meilleur minimum dans ces exemples. Même placé proche de $y_2$, il arrive à s'extirper de la pente la plus "proche" pour atteindre $y_1$ dans plus de cas que les autres algorithmes.
+	Dans les exemples ci-dessous, on observe qu'\emph{Adam} est plus efficace que les autres algorithmes pour trouver le minimum global comme on peut le voir il rejoint toujours le meilleur minimum dans ces exemples. Même placé proche de $y_2$, il arrive à s'extirper de la pente la plus "proche" pour atteindre $y_1$ dans plus de cas que les autres algorithmes\footnote{Différentes vidéos des différentes descentes sont disponibles \url{https://github.com/icannos/online-optimization/tree/master/gdsvm/exports}}.
 	
 	\begin{figure}[H]
 		\centering
@@ -267,13 +273,13 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 		\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.35]{../gdsvm/exports/adam_train.png}
-		\caption{Erreur et précision sur MNIST pour le jeu d'entraînement et le jeu de validation}
+		\caption{Erreur et précision sur MNIST pour le jeu d'entraînement et le jeu de validation de Adam}
 	\end{figure}
 	
 	
 	\subsubsection{Efficacité de Adam selon la taille des batch}
 	
-	L'une des motivations avancées pour le développement d'\emph{Adam} par ses auteurs était la résistance à ce genre de bruit induit par les différentes fonctions définies par chaque batch. On peut donc comparer la résilience d'\emph{Adam} face à différentes tailles de batch.
+	L'une des motivations avancées pour le développement d'\emph{Adam} par ses auteurs était la résistance au bruit induit par l'entraînement par batch. On peut donc comparer la résilience d'\emph{Adam} face à différentes tailles de batch.
 	
 	Tout d'abord on peut observer l'influence de la taille des batch sur Adam seul\footnote{Tous les graphes sont disponibles en grande taille dans le dossier gdsvm/exports/.}.
 	
@@ -379,15 +385,23 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 
 	On peut noter la vitesse de convergence bien plus grande de \emph{Adam} sur les grands batch que pour les autres algorithmes.
 	
+	
+\subsection{Limites d'Adam}
+
+Il est apparu que \emph{Adam} avait régulièrement tendance à moins bien permettre la généralisation lors de son utilisation pour l'apprentissage automatique en traitement de l'image notamment. En particulier, une SGD simple semble régulièrement plus efficace. En fait, il semble que ce sont des valeurs extrêmes de la taille du pas, apparaissant en fin d'entrainement qui produisent ces irrégularités. Une solution proposée en 2019 avec \emph{Adabound}\cite{limits} consiste à clipper la taille du pas dans une boîte qui se rétrécit avec le temps pour converger vers la valeur optimale pour SGD(M) que l'on obtient par exemple par \emph{grid search}. En fait, cet algorithme se comporte comme \emph{Adam} en début d'optimisation (la boîte de clippage étant grande, elle ne change pas ou pratiquement pas le pas proposé par \emph{Adam}) puis plus l'entraînement progresse plus le clippage garantit une valeur de pas constante en se comportant comme SGD. J'ai effectué les modifications nécessaires sur \emph{Adam} pour implémenter cette amélioration et effectuer quelques comparaisons sur notre exemple.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{img/mnist-comparison-adam-adabound.png}
+	\caption{Comparaison entre \emph{Adam} et \emph{Adabound} sur mnist avec les paramètres par défaut}
+\end{figure}
+	
+\section{Conclusion}
+
+S'il semble qu'aujourd'hui \emph{Adam} soit l'algorithme d'optimisation le plus utilisé dans la littérature de machine learning \cite{adamtrend}, il connait des limites notamment en terme de généralisation sur certains problèmes en reconnaissance d'images, notamment face à SGD, par exemples et des améliorations ou alternatives sont proposées\cite{limits} comme \emph{Adabound} publié en 2019.
+	
+\newpage
 \bibliographystyle{plain}	
-\bibliography{biblio}
-
-	
-
-	
-	
-
-	
-	
+\bibliography{biblio}	
 
 \end{document}

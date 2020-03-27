@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-def adagrad_step(t, w, grad, hyperparam, parameters):
+def adagrad_step(t, w, grad, hyperparam, parameters, proj=None):
     """
 
     :param t: number of that timestep
@@ -9,6 +9,7 @@ def adagrad_step(t, w, grad, hyperparam, parameters):
     :param grad: the gradient vector of the model
     :param hyperparam: dict which contains the hyperparameter specific to this algorithm.
     :param parameters: dict containing the data needed from the previous step
+    :param proj: projection function that can be used to enforce a feasible region
     :return: updated weights and parameters
 
     Parameters for adagrad:
@@ -41,6 +42,9 @@ def adagrad_step(t, w, grad, hyperparam, parameters):
 
     # We update the weights according
     w = w - (eta / (np.sqrt(G)+eps)) * grad
+
+    if proj:
+        w = proj(w)
 
     # Then set the parameters for next step
     parameters["prev_G"] = G

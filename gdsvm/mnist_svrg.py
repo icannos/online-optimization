@@ -29,5 +29,3 @@ if __name__ == "__main__":
     loss_records, valloss_records, accuracy_records, valaccuracy_records = \
             training_loop(3, grad_fn, loss_fn, np.random.randn(784), x_train, y_train, 512, x_test=x_test,
                           y_test=y_test, lamb=0.5)
-
-

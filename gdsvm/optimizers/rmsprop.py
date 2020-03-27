@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-def rms_step(t, w, grad, hyperparams, parameters):
+def rms_step(t, w, grad, hyperparams, parameters, proj):
     """
 
     :param t: number of that timestep
@@ -9,6 +9,7 @@ def rms_step(t, w, grad, hyperparams, parameters):
     :param grad: the gradient vector of the model
     :param hyperparam: dict which contains the hyperparameter specific to this algorithm.
     :param parameters: dict containing the data needed from the previous step
+    :param proj: projection function that can be used to enforce a feasible region
     :return: updated weights and parameters
 
     Parameters for RMSProp:
@@ -40,6 +41,9 @@ def rms_step(t, w, grad, hyperparams, parameters):
 
     # Update of the weights
     w = w - (eta / (np.sqrt(v)+eps)) * grad
+
+    if proj:
+        w = proj(w)
 
     # Update the parameters for next step
     parameters["prev_v"] = v

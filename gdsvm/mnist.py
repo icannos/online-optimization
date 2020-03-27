@@ -9,6 +9,7 @@ from optimizers.sgd import sgd_step
 from optimizers.rmsprop import rms_step
 from optimizers.momentum import simple_momentum_step
 from optimizers.adagrad import adagrad_step
+from optimizers.adabound import adabound_step
 
 
 
@@ -24,7 +25,7 @@ def plots(loss_records, valloss_records, accuracy_records, valaccuracy_records, 
     :return:
     """
 
-    plt.figure(1, figsize=(100, 50), dpi=200)
+    plt.figure(1, figsize=(10, 5), dpi=200)
     plt.subplots_adjust(hspace=0.3)
     plt.subplot(2, 2, 1)
     plt.title("Train loss")
@@ -62,7 +63,7 @@ def plots_val(valloss_records, valaccuracy_records, path=None, label=None):
     :return:
     """
 
-    plt.figure(1, figsize=(100, 50), dpi=200)
+    plt.figure(1, figsize=(10, 5), dpi=200)
     plt.subplots_adjust(hspace=0.3)
 
     plt.subplot(2, 1, 1)
@@ -162,7 +163,7 @@ if __name__ == "__main__":
     y_train = 2 * np.array(y_train == 0) - 1  # classification 0/autres
     y_test = 2 * np.array(y_test == 0) - 1  # classification 0/autres
 
-    step_functions = [adagrad_step, adam_step, rms_step, simple_momentum_step, sgd_step]
+    step_functions = [adam_step, adabound_step]
 
     records = []
     for step_function in step_functions:
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     plt.clf()
     for k, (loss_records, valloss_records, accuracy_records, valaccuracy_records) in enumerate(records):
         if k == len(records) - 1:
-            plots(loss_records, valloss_records, accuracy_records, valaccuracy_records, path=f"exports/mnist-comparison.png",
+            plots(loss_records, valloss_records, accuracy_records, valaccuracy_records, path=f"exports/mnist-comparison-adam-adabound.png",
                   label=step_functions[k].__name__)
         else:
             plots(loss_records, valloss_records, accuracy_records, valaccuracy_records,
