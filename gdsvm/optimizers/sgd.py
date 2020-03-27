@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-def sgd_step(t, w, grad, hyperparams, parameters, proj):
+def sgd_step(t, w, grad, hyperparams, parameters, proj=None):
     """
     Toy algo.
     The usual gradient descent.

@@ -186,7 +186,7 @@ w = w - (eta / (np.sqrt(vchap)+eps)) * mchap
 	
 	Les auteurs de \emph{Adam} proposent un résultat de convergence avec une borne sur le regret atteint par l'algorithme. Nous ne donnerons pas ici la preuve en détails car elle est particulièrement longue mais elle est disponible en annexe du papier original\cite{adam}, nous nous contenterons de l'énoncer et d'en dériver le comportement asymptotique du regret moyen.
 	
-	On se place dans le cadre décrit par \cite{zinka}. Considérons que nous disposons de $f_1 \cdots f_T$ fonctions de coûts, convexes. A chaque pas de temps on optimise $\theta_t$ de sorte à minimiser $f_t(\theta_t)$ mais aussi tous les autres $f_t$, l'objectif étant qu'à la suite de ces optimisations séquentielles on dispose d'un $\theta$ qui minimise efficacement toutes ces fonctions.  On va comparer notre résultat à la solution optimale. On définit ainsi le regret accumulé sur la séquence:
+	On se place dans le cadre décrit par Zinkevich (2003) \cite{zinka}. Considérons que nous disposons de $f_1 \cdots f_T$ fonctions de coûts, convexes. A chaque pas de temps on optimise $\theta_t$ de sorte à minimiser $f_t(\theta_t)$ mais aussi tous les autres $f_t$, l'objectif étant qu'à la suite de ces optimisations séquentielles on dispose d'un $\theta$ qui minimise efficacement toutes ces fonctions.  On va comparer notre résultat à la solution optimale. On définit ainsi le regret accumulé sur la séquence:
 	\[R(T)=\sum_{t=1}^{T}\left[f_{t}\left(\theta_{t}\right)-f_{t}\left(\theta^{*}\right)\right]\]
 	
 	Avec $\theta^* = \arg\min_{\theta} \sum_{t=1}^T f_t(\theta)$, c'est à dire les paramètres minimisant globalement les $f_t$.

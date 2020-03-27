@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-def adam_step(t, w, grad, hyperparams, parameters, proj):
+def adam_step(t, w, grad, hyperparams, parameters, proj=None):
     """
 
     :param t: number of that timestep

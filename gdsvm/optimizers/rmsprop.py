@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 
-def rms_step(t, w, grad, hyperparams, parameters, proj):
+def rms_step(t, w, grad, hyperparams, parameters, proj=None):
     """
 
     :param t: number of that timestep
